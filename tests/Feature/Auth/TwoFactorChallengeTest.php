@@ -5,21 +5,25 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
+    /** @var \Tests\TestCase $this */
     $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 });
 
 test('two factor challenge redirects to login when not authenticated', function () {
+    /** @var \Tests\TestCase $this */
     $response = $this->get(route('two-factor.login'));
 
     $response->assertRedirect(route('login'));
 });
 
 test('two factor challenge can be rendered', function () {
+    /** @var \Tests\TestCase $this */
     Features::twoFactorAuthentication([
         'confirm' => true,
         'confirmPassword' => true,
     ]);
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     $user->forceFill([
@@ -35,7 +39,8 @@ test('two factor challenge can be rendered', function () {
 
     $this->get(route('two-factor.login'))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('auth/two-factor-challenge'),
+        ->assertInertia(
+            fn(Assert $page) => $page
+                ->component('auth/two-factor-challenge'),
         );
 });

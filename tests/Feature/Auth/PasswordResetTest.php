@@ -6,18 +6,22 @@ use Illuminate\Support\Facades\Notification;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
+    /** @var \Tests\TestCase $this */
     $this->skipUnlessFortifyHas(Features::resetPasswords());
 });
 
 test('reset password link screen can be rendered', function () {
+    /** @var \Tests\TestCase $this */
     $response = $this->get(route('password.request'));
 
     $response->assertOk();
 });
 
 test('reset password link can be requested', function () {
+    /** @var \Tests\TestCase $this */
     Notification::fake();
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     $this->post(route('password.email'), ['email' => $user->email]);
@@ -26,13 +30,16 @@ test('reset password link can be requested', function () {
 });
 
 test('reset password screen can be rendered', function () {
+    /** @var \Tests\TestCase $this */
     Notification::fake();
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     $this->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+        /** @var \Tests\TestCase $this */
         $response = $this->get(route('password.reset', $notification->token));
 
         $response->assertOk();
@@ -42,13 +49,16 @@ test('reset password screen can be rendered', function () {
 });
 
 test('password can be reset with valid token', function () {
+    /** @var \Tests\TestCase $this */
     Notification::fake();
 
+    /** @var User $user */
     $user = User::factory()->create();
 
     $this->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+        /** @var \Tests\TestCase $this */
         $response = $this->post(route('password.update'), [
             'token' => $notification->token,
             'email' => $user->email,
@@ -65,6 +75,8 @@ test('password can be reset with valid token', function () {
 });
 
 test('password cannot be reset with invalid token', function () {
+    /** @var \Tests\TestCase $this */
+    /** @var User $user */
     $user = User::factory()->create();
 
     $response = $this->post(route('password.update'), [
